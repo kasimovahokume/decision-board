@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useDecisions } from '../../hooks/useDecisions';
 import { useMobileSidebar } from '../../../../shared/hooks/useMobileSidebar';
+import { Modal, Button, EmptyState } from '../../../../shared/ui';
 import Sidebar from '../Sidebar/Sidebar';
 import MobileTopBar from '../MobileTopBar/MobileTopBar';
 import DecisionForm from '../DecisionForm/DecisionForm';
@@ -14,19 +15,28 @@ export default function DecisionBoardPage() {
     decisions.length > 0 ? decisions[0].id : 'create'
   );
 
+
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
   const handleCreate = useCallback((title: string, options: string[]) => {
     const newId = createDecision(title, options);
     setActiveView(newId);
     closeSidebar(); 
   }, [createDecision, closeSidebar]);
 
-  const handleDelete = useCallback((e: React.MouseEvent, id: string) => {
+  const handleOpenDeleteModal = useCallback((e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    deleteDecision(id);
-    if (activeView === id) {
-      setActiveView(decisions.length > 1 ? decisions.find(d => d.id !== id)?.id || 'create' : 'create');
+    setDeletingId(id);
+  }, []);
+
+  const handleConfirmDelete = useCallback(() => {
+    if (!deletingId) return;
+    deleteDecision(deletingId);
+    if (activeView === deletingId) {
+      setActiveView(decisions.length > 1 ? decisions.find(d => d.id !== deletingId)?.id || 'create' : 'create');
     }
-  }, [deleteDecision, activeView, decisions]);
+    setDeletingId(null);
+  }, [deletingId, deleteDecision, activeView, decisions]);
 
   const handleSelectDecision = useCallback((id: string) => {
     setActiveView(id);
@@ -48,6 +58,7 @@ export default function DecisionBoardPage() {
 
   return (
     <div className="flex h-screen bg-zinc-50/50 overflow-hidden text-zinc-900 antialiased relative">
+      
       <Sidebar 
         isSidebarOpen={isSidebarOpen}
         closeSidebar={closeSidebar}
@@ -55,10 +66,12 @@ export default function DecisionBoardPage() {
         decisions={decisions}
         onSetCreateView={handleSetCreateView}
         onSelectDecision={handleSelectDecision}
-        onDeleteDecision={handleDelete}
+        onDeleteDecision={handleOpenDeleteModal}
       />
+
       <div className="flex-1 flex flex-col h-full overflow-hidden w-full">
         <MobileTopBar toggleSidebar={toggleSidebar} title={mobileTitle} />
+
         <div className="flex-1 overflow-y-auto p-4 sm:p-8 lg:p-12 flex flex-col">
           {activeView === 'create' ? (
             <DecisionForm 
@@ -71,14 +84,37 @@ export default function DecisionBoardPage() {
               onSelectOption={selectOption} 
             />
           ) : (
-            <div className="m-auto text-center px-4">
-              <h3 className="text-sm font-semibold text-zinc-900">Decision Seçilməyib</h3>
-              <p className="text-xs text-zinc-500 mt-1.5">Menyudan bir mövzu seçin və ya yeni decision yaradın.</p>
-            </div>
+            <EmptyState 
+              title="Decision Seçilməyib"
+              description="Menyudan bir mövzu seçin və ya yeni decision yaradın."
+              action={
+                <Button size="sm" onClick={handleSetCreateView}>
+                  + Yeni Decision
+                </Button>
+              }
+            />
           )}
         </div>
-        
       </div>
+
+      <Modal
+        isOpen={deletingId !== null}
+        onClose={() => setDeletingId(null)}
+        title="Qərarı Sil"
+      >
+        <p className="text-sm text-zinc-600 mb-6">
+          Bu qərarı silmək istədiyinizə əminsiniz? Bu əməliyyatı geri qaytarmaq mümkün olmayacaq.
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" size="sm" onClick={() => setDeletingId(null)}>
+            Ləğv et
+          </Button>
+          <Button variant="danger" size="sm" onClick={handleConfirmDelete}>
+            Bəli, Sil
+          </Button>
+        </div>
+      </Modal>
+
     </div>
   );
 }

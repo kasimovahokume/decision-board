@@ -1,31 +1,34 @@
-import React from 'react';
+import type { ButtonProps } from '../types/ui';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
-  fullWidth?: boolean;
-}
-
-export default function Button({ 
-  children, 
-  variant = 'primary', 
-  fullWidth, 
-  className = '', 
-  ...props 
+export function Button({
+  children,
+  variant = 'primary',
+  size = 'md',
+  fullWidth = false,
+  className = '',
+  disabled,
+  ...props
 }: ButtonProps) {
-  const baseStyle = "inline-flex items-center justify-center font-medium transition-colors rounded-lg text-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed";
+  const baseStyles = 'inline-flex items-center justify-center font-medium transition-all rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900 disabled:opacity-40 disabled:cursor-not-allowed';
   
   const variants = {
-    primary: "bg-indigo-600 hover:bg-indigo-700 text-white focus:ring-indigo-500",
-    secondary: "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-indigo-500",
-    danger: "bg-red-50 hover:bg-red-100 text-red-600 focus:ring-red-500",
-    ghost: "bg-transparent text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+    primary: 'bg-zinc-900 hover:bg-zinc-800 text-white shadow-sm',
+    secondary: 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900',
+    ghost: 'bg-transparent hover:bg-zinc-100 text-zinc-600 hover:text-zinc-900',
+    danger: 'bg-red-50 hover:bg-red-100 text-red-600',
   };
 
-  const widthStyle = fullWidth ? "w-full" : "";
+  const sizes = {
+    sm: 'text-xs py-1.5 px-3',
+    md: 'text-sm py-2 px-4',
+  };
+
+  const widthStyle = fullWidth ? 'w-full' : '';
 
   return (
-    <button 
-      className={`${baseStyle} ${variants[variant]} ${widthStyle} ${className}`}
+    <button
+      disabled={disabled}
+      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${widthStyle} ${className}`}
       {...props}
     >
       {children}

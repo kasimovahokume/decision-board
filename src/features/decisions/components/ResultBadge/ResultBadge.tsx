@@ -1,4 +1,3 @@
-// features/decisions/components/ResultBadge/ResultBadge.tsx
 interface ResultBadgeProps {
   label: string;
 }
