@@ -1,6 +1,5 @@
 import React from 'react';
 
-// DOMEN MODELLƏRİ
 export interface Option {
   id: string;
   label: string;
@@ -14,7 +13,6 @@ export interface Decision {
   createdAt: number;
 }
 
-// KOMPONENT PROPS TİPLƏRİ (Hamısı buradadır!)
 export interface SidebarProps {
   isSidebarOpen: boolean;
   closeSidebar: () => void;

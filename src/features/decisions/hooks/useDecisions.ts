@@ -18,14 +18,13 @@ export function useDecisions() {
       createdAt: Date.now(),
     };
     setDecisions((prev) => [newDecision, ...prev]);
-    return newDecision.id; // Yaranan kimi id-ni qaytarırıq ki, onu açaq
+    return newDecision.id;
   }
 
   function selectOption(decisionId: string, optionId: string) {
     setDecisions((prev) =>
       prev.map((decision) => {
         if (decision.id === decisionId) {
-          // KİLİD (LOCK) MƏNTİQİ: Əgər artıq seçim edilibsə, heç nə etmə!
           if (decision.selectedOptionId !== null) return decision;
           return { ...decision, selectedOptionId: optionId };
         }

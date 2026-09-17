@@ -1,13 +1,7 @@
-import type { Decision } from '../../types/decisions'; // Tiplər ancaq types papkasından gəlir!
+import { memo } from 'react';
+import type { DecisionListProps } from '../../types/decisions';
 
-interface DecisionListProps {
-  decisions: Decision[];
-  activeView: string | 'create' | null;
-  onSelect: (id: string) => void;
-  onDelete: (e: React.MouseEvent, id: string) => void;
-}
-
-export default function DecisionList({ decisions, activeView, onSelect, onDelete }: DecisionListProps) {
+function DecisionList({ decisions, activeView, onSelect, onDelete }: DecisionListProps) {
   if (decisions.length === 0) {
     return (
       <div className="px-2 py-4 text-xs text-zinc-400 text-center">
@@ -26,7 +20,7 @@ export default function DecisionList({ decisions, activeView, onSelect, onDelete
             onClick={() => onSelect(decision.id)}
             className={`group flex items-center justify-between px-2.5 py-2.5 rounded-lg cursor-pointer text-xs font-medium transition-all ${
               isActive 
-                ? 'bg-zinc-100/80 text-zinc-900 shadow-sm border border-zinc-200/60' 
+                ? 'bg-zinc-100/80 text-zinc-900 shadow-sm border border-zinc-200/60 font-semibold' 
                 : 'border border-transparent text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
             }`}
           >
@@ -37,6 +31,7 @@ export default function DecisionList({ decisions, activeView, onSelect, onDelete
               <span className="truncate">{decision.title}</span>
             </div>
             <button 
+              type="button"
               onClick={(e) => onDelete(e, decision.id)}
               className="opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-red-500 p-1 transition-opacity"
               title="Sil"
@@ -49,3 +44,4 @@ export default function DecisionList({ decisions, activeView, onSelect, onDelete
     </>
   );
 }
+export default memo(DecisionList);

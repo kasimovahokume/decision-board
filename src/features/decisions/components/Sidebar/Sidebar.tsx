@@ -21,8 +21,8 @@ export default function Sidebar({
       <div
         className={`
         fixed md:static inset-y-0 left-0 z-50
-        w-72 bg-white border-r border-zinc-200/80 flex flex-col h-full flex-shrink-0
-        transform transition-transform duration-300 ease-in-out
+        w-[85%] max-w-[320px] md:w-72 bg-white border-r border-zinc-200/80 flex flex-col h-full flex-shrink-0
+        transform transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}
       >
@@ -33,8 +33,15 @@ export default function Sidebar({
             </div>
             <span className="font-semibold text-sm tracking-tight text-zinc-900">Decision Board</span>
           </div>
-          <button onClick={closeSidebar} className="md:hidden p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg">
-            ✕
+          
+          <button 
+            onClick={closeSidebar} 
+            className="md:hidden flex items-center justify-center w-8 h-8 text-zinc-500 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors"
+            aria-label="Sidebarı bağla"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
 

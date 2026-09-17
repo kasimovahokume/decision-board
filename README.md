@@ -1,75 +1,104 @@
-# React + TypeScript + Vite
+# Decision Board
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+NV ProjectLab — Frontend Interview Task
 
-Currently, two official plugins are available:
+Sadə bir Decision Board tətbiqi. İstifadəçi bir mövzu (sual) yazır, həmin mövzuya aid seçimlər əlavə edir, seçimlərdən birini seçir və nəticəni görür.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Nümunə:
+- Where should I study?
+  - Library
+  - Home
+  - Cafe
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Texnologiyalar
 
-## Expanding the ESLint configuration
+- React (Vite)
+- TypeScript
+- Tailwind CSS
+- LocalStorage (məlumat saxlama)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Backend istifadə olunmayıb. Bütün məlumatlar brauzerin localStorage-ında saxlanılır.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Əsas funksiyalar
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Yeni decision yaratmaq
+- Decision-a seçimlər əlavə etmək
+- Seçimlərdən birini seçmək
+- Nəticəni göstərmək
+- Decision-u silmək
+- Bir neçə decision arasında keçid etmək
+- Responsive dizayn (desktop və mobile)
 
-```
+---
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+## Qərar verdiyim texniki yanaşmalar
+1. Layihə strukturu
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Kodu Feature-Sliced Design prinsiplərinə yaxın qurdum:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+    features/decisions — əsas biznes məntiqi (komponentlər, hook-lar, tiplər)
+    shared — ortaq UI komponentləri və hook-lar
+    app — giriş nöqtəsi
 
-```
+Hər komponent yalnız öz işini görür. Məsələn:
+
+    DecisionForm — yalnız yaratma forması
+    DecisionDetail — seçim və nəticə
+    Sidebar — siyahı və naviqasiya
+    OptionItem — tək seçim düyməsi
+
+---
+2. State idarəetməsi
+
+Bütün decision məlumatları useDecisions custom hook-u ilə idarə olunur.
+
+Daxilində useLocalStorage hook-u var. Bu sayədə:
+
+    Səhifə yenilənəndə məlumatlar itmir
+    localStorage oxuma/yazma məntiqi bir yerdə toplanıb
+
+Hər decision belə bir struktura malikdir:
+
+    id
+    title
+    options[]
+    selectedOptionId (seçim edilməyibsə null)
+    createdAt
+---
+3. Multiple click problemi
+
+Taskda verilən sual: istifadəçi eyni seçimə bir neçə dəfə klik etsə, nəticənin səhv hesablanmaması üçün bunu necə idarə etmək olar?
+
+Həllim iki səviyyədədir:
+
+State səviyyəsində:
+selectOption funksiyasında yoxlayıram — əgər selectedOptionId artıq null deyilsə, funksiya dərhal dayandırılır və state dəyişmir.
+
+UI səviyyəsində:
+Seçim edildikdən sonra bütün option düymələri disabled olur. Seçilməyən variantlar solğunlaşır, seçilmiş variant isə qalır.
+
+---
+4. UI / UX yanaşması
+
+    shared/ui altında təkrar istifadə olunan komponentlər yazdım: Button, Input, Card, Modal, EmptyState
+    Silmə əməliyyatında birbaşa silmirəm. Əvvəl təsdiq modalı açılır
+    Heç bir decision yoxdursa EmptyState göstərilir
+    Mobile-da sidebar hamburger menyu ilə açılır/bağlanır
+    Seçim edildikdən sonra nəticə qutusu çıxır
+---
+5. Performance
+
+    Lazım olan yerlərdə useCallback və useMemo istifadə etdim
+    Siyahı və option komponentlərini React.memo ilə sarıdım
+    Mobile sidebar məntiqini ayrıca useMobileSidebar hook-una çıxartdım
+---
+6. TypeScript
+
+Bütün domain modelləri və komponent props tipləri ayrıca types qovluqlarında saxlanılır:
+
+    features/decisions/types
+    shared/types
